@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -32,6 +33,8 @@ namespace SerialPortNotifier
             {
                 listSerialPorts.Add(portName);
             }
+            runAtStartupToolStripMenuItem.Checked = Register_RunAtStartup();
+
             Hide();
         }
 
@@ -99,10 +102,6 @@ namespace SerialPortNotifier
             base.WndProc(ref m);
         }
 
-        private void NI_Click(object sender, EventArgs e)
-        {
-        }
-
         private void NI_MouseClick(object sender, MouseEventArgs e)
         {
             switch (e.Button)
@@ -112,13 +111,9 @@ namespace SerialPortNotifier
                     break;
 
                 case MouseButtons.Right:
-                    contextMenuStrip2.Show();
+                    contextMenuStrip.Show();
                     break;
             }
-        }
-
-        private void contextMenuStrip2_Opening(object sender, CancelEventArgs e)
-        {
         }
 
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -140,7 +135,36 @@ namespace SerialPortNotifier
             }
             showLastMessage();
             NI.BalloonTipText = "";
+        }
 
+        private void runAtStartupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Register_SetRunAtStartup(!runAtStartupToolStripMenuItem.Checked);
+            runAtStartupToolStripMenuItem.Checked = Register_RunAtStartup();
+        }
+
+        private bool Register_RunAtStartup()
+        {
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", false);
+            string myName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+            object obj = registryKey.GetValue(myName, null);
+            return (obj != null);
+        }
+
+        private void Register_SetRunAtStartup(bool wantsTo)
+        {
+            // Thanks to:
+            // https://github.com/lime45/poe_folk/blob/master/ComPortNotify/MyApplicationContext.cs
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            string myName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
+            if (wantsTo)
+            {
+                registryKey.SetValue(myName, Application.ExecutablePath);
+            }
+            else
+            {
+                registryKey.DeleteValue(myName);
+            }
         }
     }
 }
