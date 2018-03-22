@@ -1,5 +1,14 @@
 language: csharp
 solution: SerialPortNotifier.sln
 
-mono:
-  - latest
+#mono:
+#  - latest
+
+#deploy:
+#  provider: releases
+#  api_key: "GITHUB OAUTH TOKEN"
+#  file_glob: true
+#  file: directory/*
+#  skip_cleanup: true
+#  on:
+#    tags: true
