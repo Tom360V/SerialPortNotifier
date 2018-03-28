@@ -8,7 +8,7 @@ before_deploy:
   - ls -al
 deploy:
   provider: releases
-  api_key: "TravisReleaseToken"
+  api_key: $TravisReleaseToken
   file_glob: true
   file: bin/Release/SerialPortNotifier.exe
   skip_cleanup: true
